@@ -18,7 +18,7 @@ local vidas = 5 --> criando limite de vidas para o jogo
 local fundo = display.newImageRect (backGroup,"imagens/fundo.jpg", 970*2, 546*2) --> colocando imagens no projeto - adicionando no grupo ( backGroup)
 fundo.x = display.contentCenterX --> dimensionando a imagen ( X para os lados - centralizada)
 fundo.y = display.contentCenterY --> dimensionando a imagen ( Y para cima ou baixo centralizada )
-
+-- (1° grupo para texto, colocar texto dentro de "" usado para mostrar texto na tela ) e depois concatenar com a varivel que quiser ( nesse caso pontos)
 local pontosText = display.newText (groupUI, "Pontos: " .. pontos, 90, 30, native.systemFont,30) --> adicionando placar na tela (variavel pontos) (display para mostra na tela) adicionando no grupo  groupUI - localizacao (100, 30) com a fonte definido nativo
 pontosText:setFillColor ( 1, 9, 0 )  --> colocando a cor
 
@@ -43,12 +43,34 @@ botaoBaixo.y = 700
 botaoBaixo.rotation = 90 --> add rotaçao do botao 
 
 local function cima () --> add funcao para ir para cima 
-    mzumbi.y = mzumbi.y - 10 --> localizacao de onde o player va ise movimentar e usamos (-10) para definir a quantidade de pixel
+    mzumbi.y = mzumbi.y - 10 --> localizacao de onde o player vai se movimentar e usamos (-10) para definir a quantidade de pixel
 end
     
 local function baixo () --> add funcao para ir para baixo
     mzumbi.y = mzumbi.y + 10 --> localizacao de onde o player va ise movimentar e usamos (-10) para definir a quantidade de pixel
+end --> sempre fechar a funcão
+--chamar a função para fazer os botoes funcionar
+botaoCima:addEventListener( "tap", cima ) --> adicionando a funcão para ser executada com o comando function para ele poder se movimentar 
+botaoBaixo:addEventListener( "tap", baixo ) --> pra chamar essa função, tem q estar com o nome exato da linha 40, 41, 42 , 43
+
+-- ADD botao de tiro
+local botaoTiro = display.newImageRect( mainGroup, "imagens/Btiro.png", 241/2, 209/2) -->  botao de tiro para
+botaoTiro.x = 900
+botaoTiro.y = 690
+
+-- > função para tirar : 
+local function atirar ()
+    local tiroPlayer = display.newImageRect( mainGroup, "imagens/tiro.png",318,159)
+    tiroPlayer.x = player.X --> falamos que o tiro tem q sair do player pq ele se movimenta, para mudar o eixo do tiro so colocar player.x -5 (testar valores)
+    tiroPlayer.y = player.Y --> se colocar assim ele vai sair alinhado do meio do jogador 
+    physucs.addBody (tiroPlayer, "dynamic", {isSensor = true}) --ADD corpo fisico, ( isSensor = true) add para ser continuo
+    transitions.to (tiroPlayer, {x=500, time=900, --> criado para ser como movimentação, ou seja o tiro andar todos os pixel caso nao certe ninguem ele passe da tela (time) velocidade do tiro
+                    onComplete = function () display.remove (tiroPlayer) end}) --> (quando a transicao por completado) foi criado uma função vazia () removesse com display remove para nao ficar varios tiros na tela
+    tiroPlayer.myName = "Stupefy"
 end
+
+
+
 
 local zumbi = display.newImageRect (mainGroup,"imagens/zumbi.png", 238*1.5, 212*1.5) --> colocando primeiro imagem zumbi - adicionando no grupo ( mainGroup - aonde deve ficar os player)
 zumbi.x= 520 --> dimensionando a imagem ( X para os lados - direcionado para o centro (520))
