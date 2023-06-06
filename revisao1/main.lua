@@ -59,32 +59,42 @@ botaoTiro.x = 900
 botaoTiro.y = 690
 
 -- > função para tirar : 
-local function atirar ()
-    local tiroPlayer = display.newImageRect( mainGroup, "imagens/tiro.png",318,159)
-    tiroPlayer.x = player.X --> falamos que o tiro tem q sair do player pq ele se movimenta, para mudar o eixo do tiro so colocar player.x -5 (testar valores)
-    tiroPlayer.y = player.Y --> se colocar assim ele vai sair alinhado do meio do jogador 
-    physucs.addBody (tiroPlayer, "dynamic", {isSensor = true}) --ADD corpo fisico, ( isSensor = true) add para ser continuo
-    transitions.to (tiroPlayer, {x=500, time=900, --> criado para ser como movimentação, ou seja o tiro andar todos os pixel caso nao certe ninguem ele passe da tela (time) velocidade do tiro
-                    onComplete = function () display.remove (tiroPlayer) end}) --> (quando a transicao por completado) foi criado uma função vazia () removesse com display remove para nao ficar varios tiros na tela
-    tiroPlayer.myName = "Stupefy"
+local function atirar () --> criando a funcção de atirar 
+    local tiroPlayer = display.newImageRect( mainGroup, "imagens/tiro.png", 318/3, 159/3) 
+    tiroPlayer.x = mzumbi.x + 50 --> falamos que o tiro tem q sair do player pq ele se movimenta, para mudar o eixo do tiro so colocar player.x -5 (testar valores)
+    tiroPlayer.y = mzumbi.y + 18--> se colocar assim ele vai sair alinhado do meio do jogador 
+    physics.addBody (tiroPlayer, "dynamic", {isSensor = true}) --ADD corpo fisico, ( isSensor = true) add para ser continuo
+    transition.to (tiroPlayer, {x=800, time=900, --> criado para ser como movimentação, ou seja o tiro andar todos os pixel caso nao certe ninguem ele passe da tela (time) velocidade do tiro
+                    onComplete = function () display.remove (tiroPlayer) end}) --> (quando a transicao por completado) foi criado uma função vazia () removesse com display remove para nao ficar varios tiros na tela, *** precisa haver quebra da pagina 
+    tiroPlayer.myName = "O Matador" --> dando nome ao personagem 
+    tiroPlayer:toBack () --> jgao o elemento para tras do grupo de exebição
 end
 
+botaoTiro:addEventListener ( "tap", atirar)
 
-
-
+--> add o inimigo
 local zumbi = display.newImageRect (mainGroup,"imagens/zumbi.png", 238*1.5, 212*1.5) --> colocando primeiro imagem zumbi - adicionando no grupo ( mainGroup - aonde deve ficar os player)
 zumbi.x= 520 --> dimensionando a imagem ( X para os lados - direcionado para o centro (520))
 zumbi.y= 500
+zumbi.myName = "Mortinho"
+physics.addBody ( zumbi, "kinematic")
+local direcaoInimigo = "cima"
 
 
 
 local zumbi1 = display.newImageRect (mainGroup,"imagens/zumbi2.png", 249*3, 130*2.5) --> colocando a segunda imagem zumbi - adicionando no grupo ( mainGroup - aonde deve ficar os player)
 zumbi1.x= 730 --> dimensionando a imagem ( X para os lados - direcionado para a direita (730))
 zumbi1.y= 500
+zumbi.myName = "Perninha"
+physics.addBody ( zumbi1, "kinematic")
+local direcaoInimigo = "baixo"
 
 
 
 local zumbi2 = display.newImageRect (mainGroup,"imagens/zumbi3.png", 225*2, 225*2) --> colocando a terceira imagem zumbi 3 - adicionando no grupo ( mainGroup - aonde deve ficar os player)
 zumbi2.x= 980 --> dimensionando a imagem ( X para os lados - direcionado para a direita (730))
 zumbi2.y= 500
+zumbi2.myName = "Bart"
+physics.addBody ( zumbi2, "kinematic")
+local direcaoInimigo = "meio"
 
