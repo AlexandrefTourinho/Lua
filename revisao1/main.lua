@@ -1,100 +1,198 @@
-local physics = require ("physics") -->Chamar a bliblioteca: a bliblioteca interna de fisica á variavel physic
-physics.start () --> iniciar a fisica no projeto 
-physics.setGravity (0,0) --> Definir a renderização (gravidade) da visualização da fisica (usando somente durante o desenvolvimento para testes ) gravidade 0 é sem gravidade 
-physics.setDrawMode ("hybrid") --> definir o modo de renderização (hybrid, normal, debug) durante a fase de programação do projeto colocar Hybrid mostra os dois, normal mostra as imagens, debug mostra somente  o comprotamento do corpo fisico
-display.setStatusBar (display.HiddenStatusBar) --> removendo a barra de notificaçao
+-- Chamar a biblioteca de física 
+local physics = require ("physics")
+-- Iniciar o motor de física
+physics.start ()
+-- Definir a gravidade.
+physics.setGravity (0, 0)
+-- Definir o modo de renderização 
+physics.setDrawMode ("normal") -- normal, hybrid, debug
 
-local backGroup = display.newGroup () --> Back usando para plano de fundo, decorações que nao terão interação com o jogo. sempre tem q ser colocado antes de qualquer coisa pq se trata do fundo -usado para colocar itens de decoração ( grama, arvore, coisas q nao interege )
+-- Remover a barra de notificações.
+display.setStatusBar (display.HiddenStatusBar)
 
-local mainGroup = display.newGroup () --> Usado para os objetos que terão interação dentro do jogo, grupo principal. coisas q bate toca quebra passa por cima(coisas que interage com o player)
+-- criar os grupos de exibição.
+local grupoBg = display.newGroup() -- Objetos decorativos, cenário (não tem interação)
+local grupoMain = display.newGroup() -- Bloco principal (tudo que precisar interagir com o player fica nesse grupo)
+local grupoUI = display.newGroup() -- Interface do usuário (placares, botões...)
 
-local groupUI = display.newGroup () --> Utilizado para placar, vidas, texto, BOTOES - PODERES que ficarão na frente do jogoporém sem interação.
+-- Criar variáveis de pontos e vidas para atribuição de valor.
+local pontos = 0
+local vidas = 5
 
---Variavel de controle
-local pontos = 0 --> criando numeros de pontos para soma
-local vidas = 5 --> criando limite de vidas para o jogo
+-- Adicionar background
+--           (grupo, "pasta/nome do arquivo.formato", largura, altura)
+local bg = display.newImageRect (grupoBg, "imagens/bg.jpg", 728*1.2, 410*1.2)
+-- localização da imagem
+bg.x = display.contentCenterX -- localização horizontal
+bg.y = display.contentCenterY -- localização vertical 
 
---> sempre usar clareza para variavel ( se é nuvem colocar nuvem, pedra colocar pedra ) para nao ter problema no codigo 
-local fundo = display.newImageRect (backGroup,"imagens/fundo.jpg", 970*2, 546*2) --> colocando imagens no projeto - adicionando no grupo ( backGroup)
-fundo.x = display.contentCenterX --> dimensionando a imagen ( X para os lados - centralizada)
-fundo.y = display.contentCenterY --> dimensionando a imagen ( Y para cima ou baixo centralizada )
--- (1° grupo para texto, colocar texto dentro de "" usado para mostrar texto na tela ) e depois concatenar com a varivel que quiser ( nesse caso pontos)
-local pontosText = display.newText (groupUI, "Pontos: " .. pontos, 90, 30, native.systemFont,30) --> adicionando placar na tela (variavel pontos) (display para mostra na tela) adicionando no grupo  groupUI - localizacao (100, 30) com a fonte definido nativo
-pontosText:setFillColor ( 1, 9, 0 )  --> colocando a cor
+-- Adicionar placar na tela. 
+-- (grupo, "Escreve o que irá aparecer na tela", localizaçãoX, localizaçãoY, fonte, tamanho da fonte)
+local pontosText = display.newText (grupoUI, "Pontos: " .. pontos, 100, 30, native.systemFont, 20)
+-- Altera a cor da variável.
+pontosText:setFillColor (0/255, 0/255, 0/255)
 
-local vidasText = display.newText (groupUI, "Vidas: " ..vidas, 300, 30, native.systemFont,30)  --> adicionando vidas na tela (variavel quantidade de vidas) (display para mostra na tela) adicionando no grupo  groupUI - localizacao (200, 30) com a fonte definido nativo
-vidasText:setFillColor ( 1, 9, 0 ) --> colocando a cor das vidas
+local vidasText = display.newText (grupoUI, "Vidas: " .. vidas, 200, 30, native.systemFont, 20)
+vidasText:setFillColor (0, 0, 0)
 
+-- Adicionar herói 
+local player = display.newImageRect (grupoMain, "imagens/harry.png", 324*0.3, 324*0.3)
+player.x = 30
+player.y = 370
+player.myName = "Harry"
+-- Adicionar corpo físico a imagem.
+physics.addBody (player, "kinematic") -- colide apenas com dinâmico e não tem interferência da gravidade.
 
-local mzumbi= display.newImageRect (mainGroup,"imagens/matadorzumbi.png", 225*2, 225*2) --> colocando imagem matador (com x2 para colocar um tamanho maior) - adicionando no grupo ( mainGroup - aonde deve ficar os player)
-mzumbi.x = 130 --> dimensionando a imagem ( X para os lados - direcionado para esquerda (130))
-mzumbi.y = 500 --> dimensionando a imagem ( Y para cima ou baixo direcionado para baixo (500))
-mzumbi.myName = "Matador de zumbi" --> cirnado o nome do player (interno) usado para colisao se nao colocar naop vai conseguir chamar para a acao de colidir
-physics.addBody (mzumbi, "kinematic") --> add um corpo fisico na imagem e definando o tipo de interaçao (kinematic) sem isso ele nao vai interagir 
-
-local botaoCima = display.newImageRect(mainGroup,"imagens/button.png", 1280/20 , 1279/20) --> criando botao
+-- Criar botões: 
+local botaoCima = display.newImageRect (grupoMain,"imagens/button.png", 1280/22, 1279/22)
 botaoCima.x = 240
-botaoCima.y = 700
-botaoCima.rotation = -90
+botaoCima.y = 440
+botaoCima.rotation = -90 -- faz a rotação da imagem em x graus.
 
-local botaoBaixo = display.newImageRect(mainGroup,"imagens/button.png", 1280/20 , 1279/20) --> criando botao
-botaoBaixo.x = 160 --> localizacao do botao
-botaoBaixo.y = 700
-botaoBaixo.rotation = 90 --> add rotaçao do botao 
+local botaoBaixo = display.newImageRect (grupoMain, "imagens/button.png", 1280/22, 1279/22)
+botaoBaixo.x = 80
+botaoBaixo.y = 440
+botaoBaixo.rotation = 90
 
-local function cima () --> add funcao para ir para cima 
-    mzumbi.y = mzumbi.y - 10 --> localizacao de onde o player vai se movimentar e usamos (-10) para definir a quantidade de pixel
-end
-    
-local function baixo () --> add funcao para ir para baixo
-    mzumbi.y = mzumbi.y + 10 --> localizacao de onde o player va ise movimentar e usamos (-10) para definir a quantidade de pixel
-end --> sempre fechar a funcão
---chamar a função para fazer os botoes funcionar
-botaoCima:addEventListener( "tap", cima ) --> adicionando a funcão para ser executada com o comando function para ele poder se movimentar 
-botaoBaixo:addEventListener( "tap", baixo ) --> pra chamar essa função, tem q estar com o nome exato da linha 40, 41, 42 , 43
+-- Adicionar funções de movimentação
+local function cima ()
+    player.y = player.y - 10
+end 
 
--- ADD botao de tiro
-local botaoTiro = display.newImageRect( mainGroup, "imagens/Btiro.png", 241/2, 209/2) -->  botao de tiro para
-botaoTiro.x = 900
-botaoTiro.y = 690
+local function baixo  ()
+    player.y = player.y + 10
+end 
 
--- > função para tirar : 
-local function atirar () --> criando a funcção de atirar 
-    local tiroPlayer = display.newImageRect( mainGroup, "imagens/tiro.png", 318/3, 159/3) 
-    tiroPlayer.x = mzumbi.x + 50 --> falamos que o tiro tem q sair do player pq ele se movimenta, para mudar o eixo do tiro so colocar player.x -5 (testar valores)
-    tiroPlayer.y = mzumbi.y + 18--> se colocar assim ele vai sair alinhado do meio do jogador 
-    physics.addBody (tiroPlayer, "dynamic", {isSensor = true}) --ADD corpo fisico, ( isSensor = true) add para ser continuo
-    transition.to (tiroPlayer, {x=800, time=900, --> criado para ser como movimentação, ou seja o tiro andar todos os pixel caso nao certe ninguem ele passe da tela (time) velocidade do tiro
-                    onComplete = function () display.remove (tiroPlayer) end}) --> (quando a transicao por completado) foi criado uma função vazia () removesse com display remove para nao ficar varios tiros na tela, *** precisa haver quebra da pagina 
-    tiroPlayer.myName = "O Matador" --> dando nome ao personagem 
-    tiroPlayer:toBack () --> jgao o elemento para tras do grupo de exebição
-end
+-- Adicionar o ouvinte e a função ao botão.
+botaoCima:addEventListener ("tap", cima)
+botaoBaixo:addEventListener ("tap", baixo)
 
-botaoTiro:addEventListener ( "tap", atirar)
+-- Adicionar botão de tiro:
+local botaoTiro = display.newImageRect (grupoMain, "imagens/tiro.png", 360/5, 360/5)
+botaoTiro.x = display.contentCenterX 
+botaoTiro.y = 440
 
---> add o inimigo
-local zumbi = display.newImageRect (mainGroup,"imagens/zumbi.png", 238*1.5, 212*1.5) --> colocando primeiro imagem zumbi - adicionando no grupo ( mainGroup - aonde deve ficar os player)
-zumbi.x= 520 --> dimensionando a imagem ( X para os lados - direcionado para o centro (520))
-zumbi.y= 500
-zumbi.myName = "Mortinho"
-physics.addBody ( zumbi, "kinematic")
+-- Função para atirar: 
+local function atirar ()
+    -- Toda vez que a função for executada cria-se um novo "tiro"
+    local feiticoPlayer = display.newImageRect (grupoMain, "imagens/laserAzul.png", 583*0.1, 428*0.1)
+    -- a localização é a mesma do player
+    feiticoPlayer.x = player.x 
+    feiticoPlayer.y = player.y 
+    physics.addBody (feiticoPlayer, "dynamic", {isSensor=true}) -- determinamos que o projétil é um sensor, o que ativa a detecção contínua de colisão.
+    -- Transição do projétil para linha x=500 em 900 milisegundos.
+    transition.to (feiticoPlayer, {x=500, time=900, 
+    -- Quando a transição for completa
+                    onComplete = function () 
+    -- Removemos o projétil do display.                    
+                     display.remove (feiticoPlayer) 
+                    end})
+    feiticoPlayer.myName = "Stupefy"
+    feiticoPlayer:toBack () -- Joga o elemento pra trás dentro do grupo de exibição dele.
+end 
+
+botaoTiro:addEventListener ("tap", atirar)
+
+-- Adicionando inimigo
+local inimigo = display.newImageRect (grupoMain, "imagens/voldemort.png", 500*0.3, 500*0.3)
+inimigo.x = 270
+inimigo.y = 370
+inimigo.myName = "Voldemort"
+physics.addBody (inimigo, "kinematic")
 local direcaoInimigo = "cima"
 
+-- Função para inimigo atirar: 
+local function inimigoAtirar ()
+    local tiroInimigo = display.newImageRect (grupoMain, "imagens/laserVerde.png", 583*0.1, 428*0.1)
+    tiroInimigo.x = inimigo.x - 50
+    tiroInimigo.y = inimigo.y 
+    tiroInimigo.rotation = 180
+    physics.addBody (tiroInimigo, "dynamic", {isSensor=true})
+    transition.to (tiroInimigo, {x=-200, time=900,
+                    onComplete = function () 
+                        display.remove (tiroInimigo) 
+                    end})
+    tiroInimigo.myName = "AvadaKedavra"
+end
 
+-- Criando o timer de disparo do inimigo:
+-- Comandos timer: (tempo repetição, função, quantidade de repetições)
+inimigo.timer = timer.performWithDelay (math.random (1000, 1500), inimigoAtirar, 0)
 
-local zumbi1 = display.newImageRect (mainGroup,"imagens/zumbi2.png", 249*3, 130*2.5) --> colocando a segunda imagem zumbi - adicionando no grupo ( mainGroup - aonde deve ficar os player)
-zumbi1.x= 730 --> dimensionando a imagem ( X para os lados - direcionado para a direita (730))
-zumbi1.y= 500
-zumbi.myName = "Perninha"
-physics.addBody ( zumbi1, "kinematic")
-local direcaoInimigo = "baixo"
+-- Movimentação do inimigo: 
+local function movimentarInimigo ()
+-- se a localização x não for igual a nulo então
+    if not (inimigo.x == nil ) then 
+-- Quando a direção do inimigo for cima então
+        if (direcaoInimigo == "cima" ) then 
+            inimigo.y = inimigo.y - 1
+--  Se a localização y do inimigo for menor ou igual a 50 então 
+            if (inimigo.y <= 50 ) then
+            -- altera a variável para "baixo"
+                direcaoInimigo = "baixo"
+            end -- if (inimigo.y.....)
+-- se a direção do inimigo for igual a baixo então        
+        elseif (direcaoInimigo == "baixo" ) then
+            inimigo.y = inimigo.y + 1 
+-- Se a localização y do inimigo for maior ou igual a 400 então 
+            if (inimigo.y >= 400 ) then 
+                direcaoInimigo = "cima"
+            end --if (inimigo.y ....)
+        end -- if (direcaoInimigo....)
+-- Se não 
+    else 
+        print ("Inimigo morreu!")
+-- Runtime: representa todo o jogo (evento é executado para todos), enterframe: está ligado ao valor de FPS do jogo (frames por segundo), no caso, a função vai ser executada 60 vezes por segundo.
+        Runtime:removeEventListener ("enterFrame", movimentarInimigo)
+    end 
+end 
 
+Runtime:addEventListener ("enterFrame", movimentarInimigo)
 
+-- Função de colisão: 
+local function onCollision (event)
+-- Quando a fase de evento for began então
+    if (event.phase == "began" ) then
+-- Variáveis criadas para facilitar a escrita do código.
+        local obj1 = event.object1
+        local obj2 = event.object2
+-- Quando o myName do objeto 1 for ... e o nome do obj2 for ...
+        if ((obj1.myName == "Stupefy" --[[Projétil player]] and obj2.myName == "Voldemort"--[[Inimigo]]) or (obj1.myName == "Voldemort" --[[Inimigo]] and obj2.myName == "Stupefy"--[[Projétil player]] )) then 
+        -- Se o obj1 for ... then 
+            if (obj1.myName == "Stupefy") then
+        -- Remove o projétil do jogo.
+                display.remove (obj1)
+            else 
+                display.remove (obj2)
+            end 
+-- Somar 10 pontos a cada colisão 
+            pontos = pontos + 10
+-- Atualizo os pontos na tela.
+            pontosText.text = "Pontos: " .. pontos
+-- Se obj1 for Player e o 2 for projétil do inimigo ou vice versa então    
+        elseif ((obj1.myName == "Harry" and obj2.myName == "AvadaKedavra") or (obj1.myName == "AvadaKedavra" and obj2.myName == "Harry")) then 
+            if (obj1.myName == "AvadaKedavra") then
+                display.remove (obj1)
+            else 
+                display.remove (obj2)
+            end 
+-- Reduz uma vida do player a cada colisão 
+        vidas = vidas - 1
+        vidasText.text = "Vidas: " .. vidas
+            if (vidas <= 0) then 
+                Runtime:removeEventListener ("collision", onCollision)
+                Runtime:removeEventListener ("enterFrame", movimentarInimigo)
+                timer.pause (inimigo.timer)
+                botaoBaixo:removeEventListener ("tap", baixo)
+                botaoCima:removeEventListener ("tap", cima)
+                botaoTiro:removeEventListener ("tap", atirar)
 
-local zumbi2 = display.newImageRect (mainGroup,"imagens/zumbi3.png", 225*2, 225*2) --> colocando a terceira imagem zumbi 3 - adicionando no grupo ( mainGroup - aonde deve ficar os player)
-zumbi2.x= 980 --> dimensionando a imagem ( X para os lados - direcionado para a direita (730))
-zumbi2.y= 500
-zumbi2.myName = "Bart"
-physics.addBody ( zumbi2, "kinematic")
-local direcaoInimigo = "meio"
+                local gameOver = display.newImageRect (grupoUI, "imagens/gameOver.png", 1080/5, 1080/5)
+                gameOver.x = display.contentCenterX
+                gameOver.y = display.contentCenterY
+            end 
+        end -- fecha o if myName
+    end -- Fecha o if event.phase
+end -- fecha a function
 
+Runtime:addEventListener ("collision",onCollision)
